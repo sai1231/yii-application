@@ -8,6 +8,7 @@ use backend\models\BranchesSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\ForbiddenHttpException;
 
 /**
  * BranchesController implements the CRUD actions for Branches model.
@@ -63,17 +64,24 @@ class BranchesController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Branches();
+        if(Yii::$app->user->can('create-branch'))
+        {
+            $model = new Branches();
 
-        if ($model->load(Yii::$app->request->post()) ) {
-            $model->branch_created_date = date('Y-m-d H:i:s');
-            $model->save();
-            return $this->redirect(['view', 'id' => $model->branch_id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            if ($model->load(Yii::$app->request->post()) ) {
+                $model->branch_created_date = date('Y-m-d H:i:s');
+                $model->save();
+                return $this->redirect(['view', 'id' => $model->branch_id]);
+            } else {
+                return $this->renderAjax('create', [
+                    'model' => $model,
+                ]);
         }
+        }else
+        {
+            throw new ForbiddenHttpException;
+        }
+        
     }
 
     /**
@@ -106,6 +114,31 @@ class BranchesController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+
+
+    public function actionLists($id)
+    {
+        $branch_count = Branches::find()
+                        ->where(['company_id'=>$id])
+                        ->count();
+
+        $branches = Branches::find()
+                        ->where(['company_id'=>$id])
+                        ->all();  
+
+        // echo Yii::trace($branches);
+        if($branch_count>0){
+            foreach ($branches as $branch) {
+                # code...
+                echo "<option value = '".$branch->branch_id."'>"  .$branch->branch_name."</option>";
+            }
+        }else
+        {
+            echo "<option></option>";
+        }
+        
     }
 
     /**

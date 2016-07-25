@@ -50,8 +50,8 @@ class Departments extends \yii\db\ActiveRecord
     {
         return [
             'department_id' => 'Department ID',
-            'branch_id' => 'Branch ID',
-            'company_id' => 'Company ID',
+            'branch_id' => 'Branch Name',
+            'company_id' => 'Company Name',
             'department_name' => 'Department Name',
             'department_created_date' => 'Department Created Date',
             'department_status' => 'Department Status',

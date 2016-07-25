@@ -2,7 +2,9 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-
+use yii\helpers\ArrayHelper;
+use backend\models\Branches;
+use backend\models\Company;
 /* @var $this yii\web\View */
 /* @var $model backend\models\Departments */
 /* @var $form yii\widgets\ActiveForm */
@@ -12,10 +14,27 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'branch_id')->textInput() ?>
+     <!-- <?= $form->field($model, 'company_id')->textInput() ?> -->
 
-    <?= $form->field($model, 'company_id')->textInput() ?>
+    <?= $form->field($model,'company_id')->dropDownList(
+        ArrayHelper::map(Company::find()->all(),'company_id','company_name'),
+        ['prompt'=>'Company name',
+            'onchange'=> '
+            $.post("index.php?r=branches/lists&id='.'"+$(this).val(),
+            function(data){
+                $("select#departments-branch_id").html(data); 
+            });'
+        ]);
+?>
 
+    <!-- <?= $form->field($model, 'branch_id')->textInput() ?> -->
+    
+    <?= $form->field($model,'branch_id')->dropDownList(
+    ArrayHelper::map(Branches::find()->all(),'branch_id','branch_name'),
+    ['prompt'=> 'Branch Name']
+        )
+    ?>
+   
     <?= $form->field($model, 'department_name')->textInput(['maxlength' => true]) ?>
 
     <!-- <?= $form->field($model, 'department_created_date')->textInput() ?> -->
